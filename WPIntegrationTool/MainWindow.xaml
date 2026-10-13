@@ -1,0 +1,273 @@
+<Window x:Class="WPIntegrationTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="WP Integration Tool"
+        Width="840" Height="860"
+        MinWidth="720" MinHeight="650"
+        WindowStartupLocation="CenterScreen"
+        Background="#F4F5F7">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
+
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24,16">
+            <StackPanel MaxWidth="760">
+
+                <!-- Title -->
+                <TextBlock Text="WP Integration Tool"
+                           FontSize="22" FontWeight="Bold" Foreground="#1A1A2E"
+                           Margin="0,0,0,4"/>
+                <TextBlock Text="CSV → JSON payload publisher with XML-driven column mapping"
+                           FontSize="12" Foreground="#888" Margin="0,0,0,20"/>
+
+                <!-- ═══════ CONNECTION SETTINGS ═══════ -->
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="Connection &amp; Authentication" Style="{StaticResource SectionHeader}"/>
+
+                        <!-- Auth Type Toggle -->
+                        <TextBlock Text="Authentication Method" Style="{StaticResource FieldLabel}"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <RadioButton x:Name="RbAuthNtlm" Content="NTLM (Windows)"
+                                         IsChecked="True" FontSize="13" Margin="0,0,24,0"
+                                         GroupName="AuthType" Checked="AuthType_Changed"/>
+                            <RadioButton x:Name="RbAuthOidc" Content="OIDC (Client Credentials)"
+                                         FontSize="13" GroupName="AuthType" Checked="AuthType_Changed"/>
+                        </StackPanel>
+
+                        <!-- Server URL + Datasource (common to both) -->
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Server Base URL" Style="{StaticResource FieldLabel}"/>
+                                <TextBox x:Name="TxtBaseUrl" Style="{StaticResource InputTextBox}"
+                                         Text="https://INHYDL22274:60930"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Datasource Name" Style="{StaticResource FieldLabel}"/>
+                                <TextBox x:Name="TxtDatasource" Style="{StaticResource InputTextBox}"
+                                         Text="WORKPACKS"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- ═══ NTLM Panel ═══ -->
+                        <StackPanel x:Name="PanelNtlm">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,8">
+                                    <TextBlock Text="Username  (DOMAIN\user or user)" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox x:Name="TxtUsername" Style="{StaticResource InputTextBox}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,8">
+                                    <TextBlock Text="Password" Style="{StaticResource FieldLabel}"/>
+                                    <PasswordBox x:Name="TxtPassword" Height="32" Padding="8,4" FontSize="13"
+                                                 BorderBrush="#CCC" BorderThickness="1" Background="#FAFAFA"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,4">
+                                    <TextBlock Text="Domain (optional)" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox x:Name="TxtDomain" Style="{StaticResource InputTextBox}"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- ═══ OIDC Panel ═══ -->
+                        <StackPanel x:Name="PanelOidc" Visibility="Collapsed">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,8">
+                                    <TextBlock Text="Authority URL" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox x:Name="TxtOidcAuthority" Style="{StaticResource InputTextBox}"
+                                             Text="https://signin.test-connect.aveva.com/"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,8">
+                                    <TextBlock Text="Audience" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox x:Name="TxtOidcAudience" Style="{StaticResource InputTextBox}"
+                                             Text="https://serviceapplications.test-connect.aveva.com"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,8">
+                                    <TextBlock Text="Client ID" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox x:Name="TxtOidcClientId" Style="{StaticResource InputTextBox}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,0,0,8">
+                                    <TextBlock Text="Client Secret" Style="{StaticResource FieldLabel}"/>
+                                    <PasswordBox x:Name="TxtOidcClientSecret" Height="32" Padding="8,4" FontSize="13"
+                                                 BorderBrush="#CCC" BorderThickness="1" Background="#FAFAFA"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,0,4">
+                                    <TextBlock Text="Scopes" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox x:Name="TxtOidcScopes" Style="{StaticResource InputTextBox}"
+                                             Text="connect"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Common bottom row -->
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <CheckBox x:Name="ChkIgnoreSsl" Content="Ignore SSL certificate errors"
+                                      IsChecked="True" FontSize="12" Foreground="#555"
+                                      VerticalAlignment="Center" Margin="0,0,16,0"/>
+                            <Button x:Name="BtnTestConnection" Content="Test Connection"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Click="BtnTestConnection_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- ═══════ SENDER / PROJECT SETTINGS ═══════ -->
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="Sender &amp; Project" Style="{StaticResource SectionHeader}"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,8">
+                                <TextBlock Text="Sent From User (email)" Style="{StaticResource FieldLabel}"/>
+                                <TextBox x:Name="TxtSentFromUser" Style="{StaticResource InputTextBox}"
+                                         Text="user@aveva.com"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,8">
+                                <TextBlock Text="Sent From ID" Style="{StaticResource FieldLabel}"/>
+                                <TextBox x:Name="TxtSentFromId" Style="{StaticResource InputTextBox}"
+                                         Text="user.name"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,4">
+                                <TextBlock Text="Project Code (ERM External Project Id)" Style="{StaticResource FieldLabel}"/>
+                                <TextBox x:Name="TxtProjectCode" Style="{StaticResource InputTextBox}"
+                                         Text="WP_INT"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,0,0,4">
+                                <TextBlock Text="Chunk Size (rows per request)" Style="{StaticResource FieldLabel}"/>
+                                <TextBox x:Name="TxtChunkSize" Style="{StaticResource InputTextBox}"
+                                         Text="500"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ═══════ FILES &amp; PUBLISH TYPE ═══════ -->
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="Files &amp; Publish Type" Style="{StaticResource SectionHeader}"/>
+
+                        <!-- Publish Type (moved above file pickers for validation context) -->
+                        <TextBlock Text="Publish Type" Style="{StaticResource FieldLabel}"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <RadioButton x:Name="RbCwpIwp" Content="CWP / IWP Publish"
+                                         IsChecked="True" FontSize="13" Margin="0,0,24,0"
+                                         GroupName="PublishType"/>
+                            <RadioButton x:Name="RbMto" Content="Actual MTO Publish"
+                                         FontSize="13" GroupName="PublishType"/>
+                        </StackPanel>
+
+                        <!-- XML Mapping File -->
+                        <TextBlock Text="XML Mapping File" Style="{StaticResource FieldLabel}"/>
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="TxtXmlPath" Style="{StaticResource InputTextBox}"
+                                     IsReadOnly="True" Text="No XML mapping file selected…" Foreground="#999"/>
+                            <Button x:Name="BtnBrowseXml" Grid.Column="1" Content="Browse…"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Click="BtnBrowseXml_Click" Margin="8,0,0,0"/>
+                        </Grid>
+                        <TextBlock x:Name="TxtXmlStatus" Text="" FontSize="11" Foreground="#888" Margin="0,0,0,10"/>
+
+                        <!-- Data File (CSV or Excel) -->
+                        <TextBlock Text="Data File (CSV or Excel)" Style="{StaticResource FieldLabel}"/>
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="TxtCsvPath" Style="{StaticResource InputTextBox}"
+                                     IsReadOnly="True" Text="No data file selected…" Foreground="#999"/>
+                            <Button x:Name="BtnBrowseCsv" Grid.Column="1" Content="Browse…"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Click="BtnBrowseCsv_Click" Margin="8,0,0,0"/>
+                        </Grid>
+                        <TextBlock x:Name="TxtCsvStatus" Text="" FontSize="11" Foreground="#888" Margin="0,0,0,4"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ═══════ ACTIONS ═══════ -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,12">
+                    <Button x:Name="BtnValidate" Content="Validate Mapping"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="BtnValidate_Click" Margin="0,0,10,0"/>
+                    <Button x:Name="BtnPreview" Content="Preview Payload"
+                            Style="{StaticResource SecondaryButton}"
+                            Click="BtnPreview_Click" Margin="0,0,10,0"/>
+                    <Button x:Name="BtnPublish" Content="Publish to API"
+                            Style="{StaticResource PrimaryButton}"
+                            Click="BtnPublish_Click"/>
+                </StackPanel>
+
+                <!-- ═══════ PROGRESS ═══════ -->
+                <Border x:Name="ProgressPanel" Style="{StaticResource CardStyle}" Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock x:Name="TxtProgress" Text="Publishing…" FontSize="13" Margin="0,0,0,6"/>
+                        <ProgressBar x:Name="PbarProgress" Height="8" Minimum="0" Maximum="100"
+                                     Foreground="#4A90D9" Background="#E8E8E8"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ═══════ LOG OUTPUT ═══════ -->
+                <Border Style="{StaticResource CardStyle}" Padding="0">
+                    <StackPanel>
+                        <Grid Margin="16,12,16,8">
+                            <TextBlock Text="Log" Style="{StaticResource SectionHeader}" Margin="0"/>
+                            <Button Content="Clear" Style="{StaticResource SecondaryButton}"
+                                    HorizontalAlignment="Right" Height="26" FontSize="11"
+                                    Click="BtnClearLog_Click"/>
+                        </Grid>
+                        <TextBox x:Name="TxtLog" Height="220" IsReadOnly="True"
+                                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                                 TextWrapping="Wrap" FontFamily="Consolas" FontSize="12"
+                                 Background="#1E1E2E" Foreground="#D4D4D4"
+                                 Padding="12" BorderThickness="0"/>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
